@@ -1,0 +1,56 @@
+# Full reversing and report-production surface.
+# Project orientation
+list_programs
+get_program_info
+get_program_memory_map
+list_memory_blocks
+list_program_imports
+list_program_exports
+
+# Candidate discovery
+list_strings
+search_memory_text
+search_memory_bytes
+list_functions
+search_functions_by_name
+
+# Function, listing, data, and relationship inspection
+get_function_info
+get_function_call_relationships
+list_function_basic_blocks
+get_function_call_graph
+decompile_function
+get_listing_at_address
+read_memory_bytes
+get_data_at_address
+list_references_to_address
+list_references_from_address
+list_function_variables
+get_function_stack_frame
+list_function_variable_identities
+list_data_items
+
+# Routine semantic annotation
+set_function_name
+set_variable_name
+set_variable_type
+set_variable_name_by_id
+set_variable_type_by_id
+create_stack_variable
+set_function_prototype
+set_function_noreturn
+set_instruction_flow_override
+set_data_label
+set_address_label
+apply_data_type
+set_comment_at_address
+
+# Exact code recovery
+create_function
+set_function_body
+disassemble_memory
+clear_code_units
+write_memory_bytes
+
+# Explicit persistence
+save_program

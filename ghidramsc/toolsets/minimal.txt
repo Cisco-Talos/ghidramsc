@@ -1,0 +1,9 @@
+# Minimal read-only orientation.
+# Project and program identity
+list_programs
+get_program_info
+
+# Fast candidate discovery
+list_strings
+list_functions
+decompile_function

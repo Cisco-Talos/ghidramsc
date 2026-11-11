@@ -1,0 +1,21 @@
+# GhidraMSC ignores
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+ghidramsc.toml
+output/
+*.egg-info/
+.venv/
+dev/
+.ghidramsc_port
+/.codex/
+
+# Gradle / plugin build artifacts
+plugin/.gradle/
+plugin/build/
+plugin/lib/
+
+# Ignore all of plugin/dist/ except the pre-built zip
+plugin/dist/*
+!plugin/dist/GhidraMSCPlugin.zip

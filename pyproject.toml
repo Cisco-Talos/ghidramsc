@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ghidramsc"
+version = "0.9.0rc1"
+requires-python = ">=3.10"
+dependencies = [
+    # Ghidra 12.1.4 bundles PyGhidra 3.1.0; this is the tested runtime contract.
+    "pyghidra==3.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+
+[project.scripts]
+ghidramsc = "ghidramsc.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ghidramsc*"]
+
+[tool.setuptools.package-data]
+ghidramsc = ["toolsets/*.txt"]

@@ -1,0 +1,125 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// Copyright 2026 Cisco Systems, Inc. and its affiliates
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// GhidraMSCPlugin -- Ghidra extension build script.
+//
+// Offline build: local Gradle 9.7.1 --offline -p plugin clean buildExtension
+// Output:  dist/GhidraMSCPlugin.zip
+//
+// Set GHIDRA_INSTALL_DIR via environment variable or -P project property.
+
+apply plugin: 'java-library'
+
+def ghidraInstallDir
+
+if (System.env.GHIDRA_INSTALL_DIR) {
+    ghidraInstallDir = System.env.GHIDRA_INSTALL_DIR
+}
+else if (project.hasProperty("GHIDRA_INSTALL_DIR")) {
+    ghidraInstallDir = project.getProperty("GHIDRA_INSTALL_DIR")
+}
+else {
+    throw new GradleException(
+        "GHIDRA_INSTALL_DIR not set.  Export it as an environment variable " +
+        "or pass -PGHIDRA_INSTALL_DIR=/path/to/ghidra on the command line.")
+}
+
+def ghidraDir = new File(ghidraInstallDir, "Ghidra").getCanonicalPath()
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenCentral()
+}
+
+def ghidraJars = files(
+    fileTree(dir: ghidraDir + '/Framework', include: '**/*.jar'),
+    fileTree(dir: ghidraDir + '/Features', include: '**/*.jar'),
+    fileTree(dir: ghidraDir + '/Debug', include: '**/*.jar'),
+    fileTree(dir: ghidraDir + '/Processors', include: '**/*.jar')
+)
+
+dependencies {
+    // Ghidra JARs (compile-only -- bundled by the runtime).
+    compileOnly ghidraJars
+
+    // Gson -- Ghidra bundles it at runtime, but we need it at compile time.
+    compileOnly 'com.google.code.gson:gson:2.10.1'
+
+    testImplementation ghidraJars
+    testImplementation 'com.google.code.gson:gson:2.10.1'
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+sourceSets {
+    test {
+        java.srcDir '../tests/java'
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+// --- Extension ZIP packaging ---
+
+def DIST_DIR = file("dist")
+
+task buildExtension(type: Zip) {
+    group = "Ghidra"
+    description = "Build the GhidraMSCPlugin Ghidra extension ZIP."
+
+    archiveBaseName = "GhidraMSCPlugin"
+    archiveExtension = 'zip'
+    archiveVersion = ''
+    destinationDirectory = DIST_DIR
+    duplicatesStrategy = 'exclude'
+
+    def pathInZip = "GhidraMSCPlugin"
+
+    from(project.file("extension.properties")) {
+        into pathInZip
+    }
+
+    from(project.file("Module.manifest")) {
+        into pathInZip
+    }
+
+    from(project.jar) {
+        into pathInZip + "/lib"
+    }
+
+    from(project.file("lib")) {
+        into pathInZip + "/lib"
+        include '*.jar'
+    }
+
+    dependsOn jar
+}
+
+// Ensure lib/ dir exists for any runtime-only deps that get copied.
+task copyDependencies(type: Copy) {
+    from configurations.runtimeClasspath
+    into "lib"
+    exclude { it.file.canonicalPath.startsWith(new File(ghidraInstallDir).canonicalPath) }
+}
+
+compileJava.dependsOn copyDependencies

@@ -1,0 +1,16 @@
+# Configuration
+# Copy this file to ghidramsc.toml and edit the paths.
+
+[ghidramsc]
+# Absolute path to the Ghidra installation directory
+ghidra_install_dir = "C:/tools/ghidra_12.1.4_PUBLIC"
+
+# Directory containing the .gpr file (NOT the .gpr file itself)
+project_path = "C:/ghidra_projects"
+
+# Project name -- the .gpr filename without the extension.
+# For example if the file is MyProject.gpr, use "MyProject".
+project_name = "MyProject"
+
+# Optional: port for the HTTP query server (default 13100)
+# server_port = 13100
